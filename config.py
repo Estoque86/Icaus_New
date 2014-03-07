@@ -64,20 +64,22 @@ RESULTS_FORMAT = 'PICKLE'
 # List of caching and routing strategies tested
 # This below is the complete list of strategies currently implemented.
 # The code is located in ./icarus/models/strategy.py
-STRATEGIES = [
-     'LCE',             # Leave Copy Everywhere
-     'NO_CACHE',        # No caching, shorest-path routing
-     'HR_SYMM',         # Symmetric hash-routing
-     'HR_ASYMM',        # Asymmetric hash-routing
-     'HR_MULTICAST',    # Multicast hash-routing
-     'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
-     'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
-     'CL4M',            # Cache less for more
-     'PROB_CACHE',      # ProbCache
-     'LCD',             # Leave Copy Down
-     'RAND_CHOICE',     # Random choice: cache in one random cache on path
-     'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
-             ]
+#STRATEGIES = [
+#     'LCE',             # Leave Copy Everywhere
+#     'NO_CACHE',        # No caching, shorest-path routing
+#     'HR_SYMM',         # Symmetric hash-routing
+#     'HR_ASYMM',        # Asymmetric hash-routing
+#     'HR_MULTICAST',    # Multicast hash-routing
+#     'HR_HYBRID_AM',    # Hybrid Asymm-Multicast hash-routing
+#     'HR_HYBRID_SM',    # Hybrid Symm-Multicast hash-routing
+#     'CL4M',            # Cache less for more
+#     'PROB_CACHE',      # ProbCache
+#     'LCD',             # Leave Copy Down
+#     'RAND_CHOICE',     # Random choice: cache in one random cache on path
+#     'RAND_BERNOULLI',  # Random Bernoulli: cache randomly in caches on path
+#             ]
+
+STRATEGIES = ['LCE']
 
 # Cache replacement policy used by the network caches.
 # Supported policies are: 'LRU', 'LFU', 'FIFO', 'RAND' and 'NULL'

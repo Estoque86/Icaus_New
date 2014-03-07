@@ -259,7 +259,7 @@ def topology_linear(network_cache=0.05, n_contents=100000, seed=None):
     #content_placement = uniform_content_placement(topology, range(1, n_contents+1), sources, seed=seed)
     content_placement = uniform_content_placement(topology, range(1, n_contents+1), sources, seed=seed)
     
-    add stacks to nodes
+    #add stacks to nodes
     for v in sources:
         fnss.add_stack(topology, v, 'source', {'contents': content_placement[v]})
     for v in receivers:
@@ -299,7 +299,7 @@ def topology_linear(network_cache=0.05, n_contents=100000, seed=None):
 
 
 @register_topology_factory('SINGLE_CACHE')
-def topology_linear(network_cache=0.05, n_contents=100000, seed=None):
+def topology_single_cache(network_cache=0.05, n_contents=100000, seed=None):
     """
         Return a scenario based on GEANT topology
         

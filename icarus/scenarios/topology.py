@@ -17,6 +17,8 @@ __all__ = [
         'topology_tiscali',
         'topology_wide',
         'topology_garr',
+        'topology_linear',
+        'topology_single_cache',
            ]
 
 
@@ -193,6 +195,209 @@ def topology_geant(network_cache=0.05, n_contents=100000, seed=None):
     for node, size in cache_placement.iteritems():
         fnss.add_stack(topology, node, 'cache', {'size': size})
     return topology
+
+@register_topology_factory('LINEAR')
+def topology_linear(network_cache=0.05, n_contents=100000, seed=None):
+    """
+        Return a scenario based on GEANT topology
+        
+        Parameters
+        ----------
+        network_cache : float
+        Size of network cache (sum of all caches) normalized by size of content
+        population
+        n_contents : int
+        Size of content population
+        seed : int, optional
+        The seed used for random number generation
+        
+        Returns
+        -------
+        topology : fnss.Topology
+        The topology object
+        """
+    # 240 nodes in the main component
+    #topology = fnss.parse_topology_zoo(path.join(TOPOLOGY_RESOURCES_DIR,
+    #                                             'Geant2012.graphml')
+    #                                   ).to_undirected()
+    
+    numnodes = 3
+    topology = fnss.topologies.simplemodels.line_topology(numnodes)
+    
+    topology = nx.connected_component_subgraphs(topology)[0]
+    deg = nx.degree(topology)
+    nodes = topology.nodes()
+
+    #receivers = [v for v in topology.nodes() if deg[v] == 1] # 8 nodes
+    receivers = []
+    receivers.append(nodes[0])
+    
+    #caches = [v for v in topology.nodes() if deg[v] > 2] # 19 nodes
+    caches = []
+    caches.append(nodes[2])
+    
+    # attach sources to topology
+    #source_attachments = [v for v in topology.nodes() if deg[v] == 2] # 13 nodes
+    source_attachment = caches[0]
+
+    #sources = []
+    #for v in source_attachments:
+    #    u = v + 1000 # node ID of source
+    #    topology.add_edge(v, u)
+    #    sources.append(u)
+    sources = []
+    u = source_attachment + 1000
+    sources.append(u)
+
+    topology.add_edge(source_attachment, sources[0])
+
+    #routers = [v for v in topology.nodes() if v not in caches + sources + receivers]
+    routers = []
+    routers.append(nodes[1])
+    
+    # randomly allocate contents to sources
+    #content_placement = uniform_content_placement(topology, range(1, n_contents+1), sources, seed=seed)
+    content_placement = uniform_content_placement(topology, range(1, n_contents+1), sources, seed=seed)
+    
+    add stacks to nodes
+    for v in sources:
+        fnss.add_stack(topology, v, 'source', {'contents': content_placement[v]})
+    for v in receivers:
+        fnss.add_stack(topology, v, 'receiver', {})
+    for v in routers:
+        fnss.add_stack(topology, v, 'router', {})
+    #fnss.add_stack(topology, source, 'source', {'contents': content_placement[source]})
+    #fnss.add_stack(topology, receiver, 'receiver', {})
+    #fnss.add_stack(topology, router, 'router', {})
+
+    # set weights and delays on all links
+    fnss.set_weights_constant(topology, 1.0)
+    fnss.set_delays_constant(topology, INTERNAL_LINK_DELAY, 'ms')
+    # label links as internal or external
+    for u, v in topology.edges_iter():
+        if u in sources or v in sources:
+            topology.edge[u][v]['type'] = 'external'
+            # this prevents sources to be used to route traffic
+            fnss.set_weights_constant(topology, 1000.0, [(u, v)])
+            fnss.set_delays_constant(topology, EXTERNAL_LINK_DELAY, 'ms', [(u, v)])
+        else:
+            topology.edge[u][v]['type'] = 'internal'
+
+    #topology.edge[source_attachment][source]['type'] = 'external'
+    #fnss.set_weights_constant(topology, 1000.0, [(source_attachment, source)])
+    #fnss.set_delays_constant(topology, external_link_delay, 'ms', [(source_attachment, source)])
+    #topology.edge[receiver][router]['type'] = 'internal'
+    #topology.edge[router][cache]['type'] = 'internal'
+
+    
+    # place caches
+    #cache_placement = uniform_cache_placement(topology, network_cache*n_contents, caches)
+    cache_placement = uniform_cache_placement(topology, network_cache*n_contents, caches)
+    for node, size in cache_placement.iteritems():
+        fnss.add_stack(topology, node, 'cache', {'size': size})
+    return topology
+
+
+@register_topology_factory('SINGLE_CACHE')
+def topology_linear(network_cache=0.05, n_contents=100000, seed=None):
+    """
+        Return a scenario based on GEANT topology
+        
+        Parameters
+        ----------
+        network_cache : float
+        Size of network cache (sum of all caches) normalized by size of content
+        population
+        n_contents : int
+        Size of content population
+        seed : int, optional
+        The seed used for random number generation
+        
+        Returns
+        -------
+        topology : fnss.Topology
+        The topology object
+        """
+    # 240 nodes in the main component
+    #topology = fnss.parse_topology_zoo(path.join(TOPOLOGY_RESOURCES_DIR,
+    #                                             'Geant2012.graphml')
+    #                                   ).to_undirected()
+    
+    numnodes = 2
+    topology = fnss.topologies.simplemodels.line_topology(numnodes)
+    
+    topology = nx.connected_component_subgraphs(topology)[0]
+    deg = nx.degree(topology)
+    nodes = topology.nodes()
+    
+    #receivers = [v for v in topology.nodes() if deg[v] == 1] # 8 nodes
+    receivers = []
+    receivers.append(nodes[0])
+    
+    #caches = [v for v in topology.nodes() if deg[v] > 2] # 19 nodes
+    caches = []
+    caches.append(nodes[1])
+    
+    
+    # attach sources to topology
+    #source_attachments = [v for v in topology.nodes() if deg[v] == 2] # 13 nodes
+    source_attachment = caches[0]
+    
+    #sources = []
+    #for v in source_attachments:
+    #    u = v + 1000 # node ID of source
+    #    topology.add_edge(v, u)
+    #    sources.append(u)
+    sources = []
+    u = source_attachment + 1000
+    sources.append(u)
+    topology.add_edge(source_attachment, sources[0])
+    
+    #routers = [v for v in topology.nodes() if v not in caches + sources + receivers]
+    #router = nodes[1]
+    
+    # randomly allocate contents to sources
+    #content_placement = uniform_content_placement(topology, range(1, n_contents+1), sources, seed=seed)
+    content_placement = uniform_content_placement(topology, range(1, n_contents+1), sources, seed=seed)
+    
+    # add stacks to nodes
+    for v in sources:
+        fnss.add_stack(topology, v, 'source', {'contents': content_placement[v]})
+    for v in receivers:
+        fnss.add_stack(topology, v, 'receiver', {})
+
+    #fnss.add_stack(topology, source, 'source', {'contents': content_placement[source]})
+    #fnss.add_stack(topology, receiver, 'receiver', {})
+    #fnss.add_stack(topology, router, 'router', {})
+    
+    # set weights and delays on all links
+    fnss.set_weights_constant(topology, 1.0)
+    fnss.set_delays_constant(topology, INTERNAL_LINK_DELAY, 'ms')
+
+    # label links as internal or external
+    for u, v in topology.edges_iter():
+        if u in sources or v in sources:
+            topology.edge[u][v]['type'] = 'external'
+            # this prevents sources to be used to route traffic
+            fnss.set_weights_constant(topology, 1000.0, [(u, v)])
+            fnss.set_delays_constant(topology, EXTERNAL_LINK_DELAY, 'ms', [(u, v)])
+        else:
+            topology.edge[u][v]['type'] = 'internal'
+
+    #topology.edge[source_attachment][source]['type'] = 'external'
+    #fnss.set_weights_constant(topology, 1000.0, [(source_attachment, source)])
+    #fnss.set_delays_constant(topology, external_link_delay, 'ms', [(source_attachment, source)])
+    #topology.edge[receiver][cache]['type'] = 'internal'
+    #topology.edge[router][cache]['type'] = 'internal'
+    
+    
+    # place caches
+    #cache_placement = uniform_cache_placement(topology, network_cache*n_contents, caches)
+    cache_placement = uniform_cache_placement(topology, network_cache*n_contents, caches)
+    for node, size in cache_placement.iteritems():
+        fnss.add_stack(topology, node, 'cache', {'size': size})
+    return topology
+
 
 
 @register_topology_factory('TISCALI')

@@ -10,33 +10,34 @@ LOG_LEVEL = 'INFO'
 # Range of alpha values of the Zipf distribution using to generate content requests
 # alpha values must be positive. The greater the value the more skewed is the 
 # content popularity distribution
-# Range of alpha values of the Zipf distribution using to generate content requests
-# alpha values must be positive. The greater the value the more skewed is the 
-# content popularity distribution
 # Note: to generate these alpha values, numpy.arange could also be used, but it
 # is not recommended because generated numbers may be not those desired. 
 # E.g. arange may return 0.799999999999 instead of 0.8. 
 # This would give problems while trying to plot the results because if for
 # example I wanted to filter experiment with alpha=0.8, experiments with
 # alpha = 0.799999999999 would not be recognized 
-ALPHA = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1]
+#ALPHA = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1]
+ALPHA = [1.0]
 
 # Total size of network cache as a fraction of content population
-NETWORK_CACHE = [0.004, 0.002, 0.01, 0.05]
+#NETWORK_CACHE = [0.004, 0.002, 0.01, 0.05]
+NETWORK_CACHE = [0.001]
 
 # Number of content objects
-N_CONTENTS = 3*10**5
+#N_CONTENTS = 3*10**5
+N_CONTENTS = 1*10**5
 
 # Granularity of caching.
 # Currently, only OBJECT is supported
 CACHING_GRANULARITY = 'OBJECT'
 
 # Number of requests per second (over the whole network)
-NETWORK_REQUEST_RATE = 12.0
+NETWORK_REQUEST_RATE = 3.0
 
 # Number of content requests generated to prepopulate the caches
 # These requests are not logged
-N_WARMUP_REQUESTS = 2*10**5
+#N_WARMUP_REQUESTS = 2*10**5
+N_WARMUP_REQUESTS = 0
 
 # Number of content requests generated after the warmup and logged
 # to generate results. 
@@ -52,7 +53,8 @@ N_PROCESSES = cpu_count()
 
 # Topologies used for the simulation.
 # Topology implementations are located in ./icarus/scenarios/topology.py
-TOPOLOGIES = ['GEANT', 'WIDE', 'GARR', 'TISCALI']
+#TOPOLOGIES = ['GEANT', 'WIDE', 'GARR', 'TISCALI']
+TOPOLOGIES = ['SINGLE_CACHE']
 
 # Format in which results are saved.
 # Result readers and writers are located in module ./icarus/results/readwrite.py
@@ -84,7 +86,7 @@ CACHE_POLICY = 'LRU'
 
 # Number of times each experiment is replicated
 # This is necessary for extracting confidence interval of selected metrics
-N_REPLICATIONS = 5
+N_REPLICATIONS = 2
 
 # List of metrics to be measured in the experiments
 # The implementation of data collectors are located in ./icaurs/execution/collectors.py

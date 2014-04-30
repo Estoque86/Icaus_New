@@ -278,8 +278,7 @@ def topology_grid(network_cache=0.35, n_contents=100000, seed=None):
     cache_placement = uniform_cache_placement(topology, network_cache*n_contents, caches)
     for node, size in cache_placement.iteritems():
         fnss.add_stack(topology, node, 'cache', {'size': size})
-
-return topology
+    return topology
 
 
 

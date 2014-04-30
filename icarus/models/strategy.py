@@ -661,7 +661,7 @@ class RandomBernoulli(Strategy):
     """
 
     @inheritdoc(Strategy)
-    def __init__(self, view, controller, symm_paths=True, p=0.2):
+    def __init__(self, view, controller, symm_paths=True, p=0.02):
         super(RandomBernoulli, self).__init__(view, controller)
         self.symm_paths = symm_paths
         self.p = p

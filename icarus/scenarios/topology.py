@@ -19,6 +19,7 @@ __all__ = [
         'topology_garr',
         'topology_linear',
         'topology_single_cache',
+        'topology_grid',
            ]
 
 
@@ -195,6 +196,92 @@ def topology_geant(network_cache=0.05, n_contents=100000, seed=None):
     for node, size in cache_placement.iteritems():
         fnss.add_stack(topology, node, 'cache', {'size': size})
     return topology
+
+
+@register_topology_factory('GRID')
+def topology_grid(network_cache=0.35, n_contents=100000, seed=None):
+    # This gives you a 2D grid topology 3x2
+    topology = fnss.Topology(nx.grid_2d_graph(10,10))
+    # If you want a 3D grid topology, use this command instead
+    # This create a 4x3x2 3D grid
+    # topology = fnss.Topology(nx.grid_graph([4,3,2]))
+    # TODO: Here place caches, content sources, receivers.
+    # See other topology generators as examples
+    topology = nx.connected_component_subgraphs(topology)[0]
+    deg = nx.degree(topology)
+    nodes = topology.nodes()
+    num_sources = 4
+    num_receivers = 30
+    source_attachments = []
+    sources = []
+    receivers = []
+    caches = []
+
+    chosen_attachments = 0
+    chosen_receivers = 0
+
+    # Random pacement of SOURCES
+    completed = False
+    while (!completed)
+        x = random.choice(nodes)
+        if x in source_attachments:
+            continue
+        else:
+            source_attachments.append(x)
+            chosen_attachments += 1
+        if chosen_attachments == num_attachments
+            completed = True
+
+    for v in source_attachments:
+        u = v + 1000 # node ID of source
+        topology.add_edge(v, u)
+        sources.append(u)
+
+    # Random placement of RECEIVERS
+    completed = False
+    while (!completed)
+        x = random.choice(nodes)
+        if x in source_attachments:
+            continue
+        else:
+            receivers.append(x)
+            chosen_receivers += 1
+        if chosen_receivers == num_receivers
+            completed = True
+
+    # Placement of RECEIVERS
+    caches = [v for v in nodes if v not in receivers]
+
+    # randomly allocate contents to sources
+    content_placement = uniform_content_placement(topology, range(1, n_contents+1), sources, seed=seed)
+
+    # add stacks to nodes
+    for v in sources:
+        fnss.add_stack(topology, v, 'source', {'contents': content_placement[v]})
+    for v in receivers:
+        fnss.add_stack(topology, v, 'receiver', {})
+
+    # set weights and delays on all links
+    fnss.set_weights_constant(topology, 1.0)
+    fnss.set_delays_constant(topology, INTERNAL_LINK_DELAY, 'ms')
+    # label links as internal or external
+    for u, v in topology.edges_iter():
+        if u in sources or v in sources:
+            topology.edge[u][v]['type'] = 'external'
+            # this prevents sources to be used to route traffic
+            fnss.set_weights_constant(topology, 1000.0, [(u, v)])
+            fnss.set_delays_constant(topology, EXTERNAL_LINK_DELAY, 'ms', [(u, v)])
+        else:
+            topology.edge[u][v]['type'] = 'internal'
+                
+    # place caches
+    cache_placement = uniform_cache_placement(topology, network_cache*n_contents, caches)
+    for node, size in cache_placement.iteritems():
+        fnss.add_stack(topology, node, 'cache', {'size': size})
+
+return topology
+
+
 
 @register_topology_factory('LINEAR')
 def topology_linear(network_cache=0.05, n_contents=100000, seed=None):

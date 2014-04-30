@@ -231,6 +231,10 @@ def run_scenario(settings, params, curr_exp, n_exp):
                        else settings.CACHE_POLICY
         metrics = settings.DATA_COLLECTORS
         
+        ## MT add
+        log_dir = settings.LOG_DIR
+        scenario_id = 'T=%s-C=%s-A=%s-S=%s-Run=%s' % (topology_name, str(network_cache), str(alpha), strategy_name, str(n_exp))
+        
         scenario = "%s, %s, alpha: %s, netcache: %s" % (topology_name, strategy_name, str(alpha), str(network_cache))
         logger.info('Experiment %d/%d | Preparing scenario: %s', curr_exp, n_exp, scenario)
         

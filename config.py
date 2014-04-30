@@ -3,6 +3,8 @@
 from multiprocessing import cpu_count
 from collections import deque
 
+LOG_DIR = path.abspath(path.join(path.dirname(__file__), path.pardir, 'logs'))
+
 # Level of logging output
 # Available options: DEBUG, INFO, WARNING, ERROR, CRITICAL
 LOG_LEVEL = 'INFO'

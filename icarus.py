@@ -24,6 +24,7 @@ def main():
     parser.add_argument("config",
                         help="configuration file")
     args = parser.parse_args()
+    print args.config
     icarus.run.run(args.config, args.results)
     if args.plotsdir:
         icarus.results.plot.run(args.config, args.results, args.plotsdir)

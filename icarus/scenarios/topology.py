@@ -222,14 +222,14 @@ def topology_grid(network_cache=0.35, n_contents=100000, seed=None):
 
     # Random pacement of SOURCES
     completed = False
-    while (completed == False)
+    while (completed == False):
         x = random.choice(nodes)
         if x in source_attachments:
             continue
         else:
             source_attachments.append(x)
             chosen_attachments += 1
-        if chosen_attachments == num_attachments
+        if chosen_attachments == num_attachments:
             completed = True
 
     for v in source_attachments:
@@ -239,14 +239,14 @@ def topology_grid(network_cache=0.35, n_contents=100000, seed=None):
 
     # Random placement of RECEIVERS
     completed = False
-    while (completed == False)
+    while (completed == False):
         x = random.choice(nodes)
         if x in source_attachments:
             continue
         else:
             receivers.append(x)
             chosen_receivers += 1
-        if chosen_receivers == num_receivers
+        if chosen_receivers == num_receivers:
             completed = True
 
     # Placement of RECEIVERS
